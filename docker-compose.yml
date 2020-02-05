@@ -1,0 +1,71 @@
+version: '2'
+
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - 9000:9000
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./data/portainer_data:/data"
+
+  elasticsearch:
+    build: ./elastic 
+    container_name: elasticsearch
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+      - ./elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  kibana:
+    build: ./kibana
+    container_name: kibana
+    ports:
+      - 5601:5601
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
+      
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: mirthdb
+      POSTGRES_USER: mirthdb
+      POSTGRES_DB: mirthdb
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5432:5432
+  
+  mirth:
+    image: nextgenhealthcare/connect
+    container_name: mirth
+    volumes:
+      - ./mirth:/opt/connect/appdata
+    environment:
+      - DATABASE=postgres
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/mirthdb
+      - DATABASE_MAX_CONNECTIONS=20
+      - DATABASE_USERNAME=mirthdb
+      - DATABASE_PASSWORD=mirthdb
+      - KEYSTORE_STOREPASS=docker_storepass
+      - KEYSTORE_KEYPASS=docker_keypass
+    ports:
+      - 8443:8443/tcp
+    depends_on:
+      - postgres
+
+volumes:
+  elastic:
+    driver: local
+  data: {}
+  config: {}
