@@ -1,0 +1,4 @@
+FROM mysql
+
+ENV MYSQL_DATABASE mirthdb
+ENV MYSQL_ROOT_PASSWORD mirthdb

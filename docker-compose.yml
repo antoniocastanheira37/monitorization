@@ -36,11 +36,21 @@ services:
     links:
       - elasticsearch
       
-  postgres:
-    build: ./postgres
-    container_name: postgres
+  mysql:
+    image: mysql
+    container_name: mysql
+    environment:
+      - MYSQL_DATABASE=mirthdb
+      - MYSQL_USER=mirthdb
+      - MYSQL_PASSWORD=mirthdb
+      - MYSQL_ROOT_PASSWORD=mirthdb
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - my-db:/var/lib/mysql
     ports:
-      - 5432:5432
+      - 3306:3306
+    expose:
+      - 3306
   
   mirth:
     image: nextgenhealthcare/connect
@@ -48,17 +58,18 @@ services:
     volumes:
       - ./mirth:/opt/connect/appdata
     environment:
-      - DATABASE=postgres
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/pce
+      - DATABASE=mysql
+      - DATABASE_URL=jdbc:mysql://mysql:3306/mirthdb
       - DATABASE_MAX_CONNECTIONS=20
-      - DATABASE_USERNAME=pce
-      - DATABASE_PASSWORD=pce
+      - DATABASE_USERNAME=mirthdb
+      - DATABASE_PASSWORD=mirthdb
       - KEYSTORE_STOREPASS=docker_storepass
       - KEYSTORE_KEYPASS=docker_keypass
     ports:
       - 8443:8443/tcp
     depends_on:
-      - postgres
+      - mysql
+    restart: on-failure
       
   logstash:
     build: ./logstash
@@ -87,15 +98,16 @@ services:
 #      - "logstash"
 #      - "kibana"
 
-  generator:
-    build: ./generator
-    container_name: generator
-    depends_on: 
-      - postgres
-      - elasticsearch
+#  generator:
+#    build: ./generator
+#    container_name: generator
+#    depends_on: 
+#      - postgres
+#      - elasticsearch
 
 volumes:
   elastic:
     driver: local
   data: {}
   config: {}
+  my-db:
