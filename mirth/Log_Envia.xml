@@ -1,9 +1,9 @@
 <channel version="3.8.1">
-  <id>2505bcb1-891d-44a9-97ab-268686b329a4</id>
+  <id>815e0078-c641-4c0f-a22d-6fd16f1c13ab</id>
   <nextMetaDataId>2</nextMetaDataId>
-  <name>Mongo Sender</name>
+  <name>Elastic Sender</name>
   <description></description>
-  <revision>20</revision>
+  <revision>5</revision>
   <sourceConnector version="3.8.1">
     <metaDataId>0</metaDataId>
     <name>sourceConnector</name>
@@ -51,10 +51,10 @@
         <queueBufferSize>1000</queueBufferSize>
       </sourceConnectorProperties>
       <driver>org.postgresql.Driver</driver>
-      <url>jdbc:postgresql://postgres:5432/mirthdb</url>
-      <username>mirthdb</username>
-      <password>mirthdb</password>
-      <select>SELECT msgid, origem, destino, evn, dataack, dataenv, episodio FROM messages where dataack &gt; current_timestamp - interval &apos;1 minute&apos;</select>
+      <url>jdbc:postgresql://postgres:5432/pce</url>
+      <username>pce</username>
+      <password>pce</password>
+      <select>SELECT msgid, origem, destino, evn, TO_CHAR(dataack, &apos;yyyy-MM-dd&quot;T&quot;HH24:MI:SS&apos;) dataack, case when dataenv=NULL then &apos;null&apos; else TO_CHAR(dataenv, &apos;yyyy-MM-dd&quot;T&quot;HH24:MI:SS&apos;) end as dataenv, episodio FROM hl7envia where dataack &gt; current_timestamp - interval &apos;1 minute&apos;</select>
       <update></update>
       <useScript>false</useScript>
       <aggregateResults>false</aggregateResults>
@@ -150,8 +150,8 @@
       <inboundTemplate encoding="base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxy
 ZXN1bHQ+CiAgICA8bXNnaWQ+dmFsdWU8L21zZ2lkPgogICAgPG9yaWdlbT52YWx1ZTwvb3JpZ2Vt
 PgogICAgPGRlc3Rpbm8+dmFsdWU8L2Rlc3Rpbm8+CiAgICA8ZXZuPnZhbHVlPC9ldm4+CiAgICA8
-ZGF0YWFjaz52YWx1ZTwvZGF0YWFjaz4KICAgIDxkYXRhZW52PnZhbHVlPC9kYXRhZW52PgogICAg
-PGVwaXNvZGlvPnZhbHVlPC9lcGlzb2Rpbz4KPC9yZXN1bHQ+Cg==</inboundTemplate>
+dG9fY2hhcmRhdGFhY2s+dmFsdWU8L3RvX2NoYXJkYXRhYWNrPgogICAgPGRhdGFlbnY+dmFsdWU8
+L2RhdGFlbnY+CiAgICA8ZXBpc29kaW8+dmFsdWU8L2VwaXNvZGlvPgo8L3Jlc3VsdD4K</inboundTemplate>
       <outboundTemplate encoding="base64">ewogICAgIm9yaWdlbSI6ICJ2YWx1ZSIsCiAgICAibXNnaWQiOiAidmFsdWUiLAoJImRlc3Rpbm8i
 OiAidmFsdWUiLAogICAgImV2biI6ICJ2YWx1ZSIsCiAgICAiZGF0YWFjayI6ICJ2YWx1ZSIsCiAg
 ICAiZGF0YWVudiI6ICJ2YWx1ZSIsCiAgICAiZXBpc29kaW8iOiAxCn0=</outboundTemplate>
@@ -210,7 +210,7 @@ ICAiZGF0YWVudiI6ICJ2YWx1ZSIsCiAgICAiZXBpc29kaW8iOiAxCn0=</outboundTemplate>
           <queueBufferSize>1000</queueBufferSize>
           <reattachAttachments>true</reattachAttachments>
         </destinationConnectorProperties>
-        <host>http://receiver:3000</host>
+        <host>http://logstash:8080</host>
         <useProxyServer>false</useProxyServer>
         <proxyAddress></proxyAddress>
         <proxyPort></proxyPort>
@@ -228,7 +228,7 @@ ICAiZGF0YWVudiI6ICJ2YWx1ZSIsCiAgICAiZXBpc29kaW8iOiAxCn0=</outboundTemplate>
         <usePreemptiveAuthentication>false</usePreemptiveAuthentication>
         <username></username>
         <password></password>
-        <content>${message.encodedData}</content>
+        <content>{&quot;msgtype&quot;: &quot;envia&quot;,${message.encodedData}}</content>
         <contentType>application/json</contentType>
         <dataTypeBinary>false</dataTypeBinary>
         <charset>UTF-8</charset>
@@ -326,7 +326,7 @@ return;</undeployScript>
     <metadata>
       <enabled>true</enabled>
       <lastModified>
-        <time>1573672707677</time>
+        <time>1583244160422</time>
         <timezone>Europe/Lisbon</timezone>
       </lastModified>
       <pruningSettings>

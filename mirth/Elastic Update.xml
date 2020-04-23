@@ -1,9 +1,9 @@
 <channel version="3.8.1">
-  <id>815e0078-c641-4c0f-a22d-6fd16f1c13ab</id>
+  <id>b7727535-b93b-484a-b581-fe6948860a39</id>
   <nextMetaDataId>2</nextMetaDataId>
-  <name>Elastic Sender</name>
+  <name>Elastic Update</name>
   <description></description>
-  <revision>8</revision>
+  <revision>17</revision>
   <sourceConnector version="3.8.1">
     <metaDataId>0</metaDataId>
     <name>sourceConnector</name>
@@ -54,7 +54,8 @@
       <url>jdbc:oracle:thin:@//192.168.1.6:1522/aida</url>
       <username>pce</username>
       <password>pce</password>
-      <select>SELECT msgid, origem, destino, nvl(evn, &apos;O19&apos;) as evn, TO_CHAR(cast(dataack as timestamp) at time zone &apos;UTC&apos;, &apos;yyyy-MM-DD&quot;T&quot;HH24:MI:SS&apos;) as dataack, TO_CHAR(cast(dataenv as timestamp) at time zone &apos;UTC&apos;, &apos;yyyy-MM-DD&quot;T&quot;HH24:MI:SS&apos;) as dataenv, episodio FROM hl7envia where dataenv &gt; sysdate - (1/1440)</select>
+      <select>SELECT msgid, TO_CHAR(cast(dataack as timestamp) at time zone &apos;UTC&apos;, &apos;yyyy-MM-DD&quot;T&quot;HH24:MI:SS&apos;) as dataack FROM hl7envia 
+where dataack &gt; sysdate - (1/1440)</select>
       <update></update>
       <useScript>false</useScript>
       <aggregateResults>false</aggregateResults>
@@ -68,93 +69,31 @@
     </properties>
     <transformer version="3.8.1">
       <elements>
-        <com.mirth.connect.model.IteratorStep version="3.8.1">
-          <name>For each msg[&apos;msgid&apos;]</name>
+        <com.mirth.connect.plugins.mapper.MapperStep version="3.8.1">
+          <name>msgid</name>
           <sequenceNumber>0</sequenceNumber>
           <enabled>true</enabled>
-          <properties>
-            <target>msg[&apos;msgid&apos;]</target>
-            <indexVariable>i</indexVariable>
-            <prefixSubstitutions>
-              <string>msg[&apos;msgid&apos;]</string>
-              <string>tmp[&apos;msgid&apos;]</string>
-            </prefixSubstitutions>
-            <children>
-              <com.mirth.connect.plugins.messagebuilder.MessageBuilderStep version="3.8.1">
-                <name>origem (out) &lt;-- origem (in)</name>
-                <sequenceNumber>0-0</sequenceNumber>
-                <enabled>true</enabled>
-                <messageSegment>tmp[&apos;origem&apos;]</messageSegment>
-                <mapping>msg[&apos;origem&apos;].toString()</mapping>
-                <defaultValue></defaultValue>
-                <replacements/>
-              </com.mirth.connect.plugins.messagebuilder.MessageBuilderStep>
-              <com.mirth.connect.plugins.messagebuilder.MessageBuilderStep version="3.8.1">
-                <name>destino (out) &lt;-- destino (in)</name>
-                <sequenceNumber>0-1</sequenceNumber>
-                <enabled>true</enabled>
-                <messageSegment>tmp[&apos;destino&apos;]</messageSegment>
-                <mapping>msg[&apos;destino&apos;].toString()</mapping>
-                <defaultValue></defaultValue>
-                <replacements/>
-              </com.mirth.connect.plugins.messagebuilder.MessageBuilderStep>
-              <com.mirth.connect.plugins.messagebuilder.MessageBuilderStep version="3.8.1">
-                <name>evn (out) &lt;-- evn (in)</name>
-                <sequenceNumber>0-2</sequenceNumber>
-                <enabled>true</enabled>
-                <messageSegment>tmp[&apos;evn&apos;]</messageSegment>
-                <mapping>msg[&apos;evn&apos;].toString()</mapping>
-                <defaultValue></defaultValue>
-                <replacements/>
-              </com.mirth.connect.plugins.messagebuilder.MessageBuilderStep>
-              <com.mirth.connect.plugins.messagebuilder.MessageBuilderStep version="3.8.1">
-                <name>dataack (out) &lt;-- dataack (in)</name>
-                <sequenceNumber>0-3</sequenceNumber>
-                <enabled>true</enabled>
-                <messageSegment>tmp[&apos;dataack&apos;]</messageSegment>
-                <mapping>msg[&apos;dataack&apos;].toString()</mapping>
-                <defaultValue></defaultValue>
-                <replacements/>
-              </com.mirth.connect.plugins.messagebuilder.MessageBuilderStep>
-              <com.mirth.connect.plugins.messagebuilder.MessageBuilderStep version="3.8.1">
-                <name>dataenv (out) &lt;-- dataenv (in)</name>
-                <sequenceNumber>0-4</sequenceNumber>
-                <enabled>true</enabled>
-                <messageSegment>tmp[&apos;dataenv&apos;]</messageSegment>
-                <mapping>msg[&apos;dataenv&apos;].toString()</mapping>
-                <defaultValue></defaultValue>
-                <replacements/>
-              </com.mirth.connect.plugins.messagebuilder.MessageBuilderStep>
-              <com.mirth.connect.plugins.messagebuilder.MessageBuilderStep version="3.8.1">
-                <name>episodio (out) &lt;-- episodio (in)</name>
-                <sequenceNumber>0-5</sequenceNumber>
-                <enabled>true</enabled>
-                <messageSegment>tmp[&apos;episodio&apos;]</messageSegment>
-                <mapping>msg[&apos;episodio&apos;].toString()</mapping>
-                <defaultValue></defaultValue>
-                <replacements/>
-              </com.mirth.connect.plugins.messagebuilder.MessageBuilderStep>
-              <com.mirth.connect.plugins.messagebuilder.MessageBuilderStep version="3.8.1">
-                <name>msgid (out) &lt;-- msgid (in)</name>
-                <sequenceNumber>0-6</sequenceNumber>
-                <enabled>true</enabled>
-                <messageSegment>tmp[&apos;msgid&apos;]</messageSegment>
-                <mapping>msg[&apos;msgid&apos;].toString()</mapping>
-                <defaultValue></defaultValue>
-                <replacements/>
-              </com.mirth.connect.plugins.messagebuilder.MessageBuilderStep>
-            </children>
-          </properties>
-        </com.mirth.connect.model.IteratorStep>
+          <variable>msgid</variable>
+          <mapping>msg[&apos;msgid&apos;].toString()</mapping>
+          <defaultValue></defaultValue>
+          <replacements/>
+          <scope>CHANNEL</scope>
+        </com.mirth.connect.plugins.mapper.MapperStep>
+        <com.mirth.connect.plugins.mapper.MapperStep version="3.8.1">
+          <name>dataack</name>
+          <sequenceNumber>1</sequenceNumber>
+          <enabled>true</enabled>
+          <variable>dataack</variable>
+          <mapping>msg[&apos;dataack&apos;].toString()</mapping>
+          <defaultValue></defaultValue>
+          <replacements/>
+          <scope>CHANNEL</scope>
+        </com.mirth.connect.plugins.mapper.MapperStep>
       </elements>
       <inboundTemplate encoding="base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxy
-ZXN1bHQ+CiAgICA8bXNnaWQ+dmFsdWU8L21zZ2lkPgogICAgPG9yaWdlbT52YWx1ZTwvb3JpZ2Vt
-PgogICAgPGRlc3Rpbm8+dmFsdWU8L2Rlc3Rpbm8+CiAgICA8bnZsPnZhbHVlPC9udmw+CiAgICA8
-ZGF0YWFjaz52YWx1ZTwvZGF0YWFjaz4KICAgIDxkYXRhZW52PnZhbHVlPC9kYXRhZW52PgogICAg
-PGVwaXNvZGlvPnZhbHVlPC9lcGlzb2Rpbz4KPC9yZXN1bHQ+Cg==</inboundTemplate>
-      <outboundTemplate encoding="base64">ewogICAgIm9yaWdlbSI6ICJ2YWx1ZSIsCiAgICAibXNnaWQiOiAidmFsdWUiLAoJImRlc3Rpbm8i
-OiAidmFsdWUiLAogICAgImV2biI6ICJ2YWx1ZSIsCiAgICAiZGF0YWFjayI6ICJ2YWx1ZSIsCiAg
-ICAiZGF0YWVudiI6ICJ2YWx1ZSIsCiAgICAiZXBpc29kaW8iOiAxCn0=</outboundTemplate>
+ZXN1bHQ+CiAgICA8bXNnaWQ+dmFsdWU8L21zZ2lkPgogICAgPGRhdGFhY2s+dmFsdWU8L2RhdGFh
+Y2s+CjwvcmVzdWx0Pgo=</inboundTemplate>
+      <outboundTemplate encoding="base64">ewogICAgIm1zZ2lkIjogInZhbHVlIiwKICAgICJkYXRhYWNrIjogInZhbHVlIgp9</outboundTemplate>
       <inboundDataType>XML</inboundDataType>
       <outboundDataType>JSON</outboundDataType>
       <inboundProperties class="com.mirth.connect.plugins.datatypes.xml.XMLDataTypeProperties" version="3.8.1">
@@ -210,7 +149,7 @@ ICAiZGF0YWVudiI6ICJ2YWx1ZSIsCiAgICAiZXBpc29kaW8iOiAxCn0=</outboundTemplate>
           <queueBufferSize>1000</queueBufferSize>
           <reattachAttachments>true</reattachAttachments>
         </destinationConnectorProperties>
-        <host>http://elasticsearch:9200/hl7_env_penafiel/_doc</host>
+        <host>http://elasticsearch:9200/hl7_env_penafiel/_update_by_query</host>
         <useProxyServer>false</useProxyServer>
         <proxyAddress></proxyAddress>
         <proxyPort></proxyPort>
@@ -228,7 +167,7 @@ ICAiZGF0YWVudiI6ICJ2YWx1ZSIsCiAgICAiZXBpc29kaW8iOiAxCn0=</outboundTemplate>
         <usePreemptiveAuthentication>false</usePreemptiveAuthentication>
         <username>admin</username>
         <password>admin</password>
-        <content>${message.encodedData}</content>
+        <content>{&quot;script&quot;: {&quot;source&quot;:&quot;ctx._source.dataack=\&quot;${dataack}\&quot;&quot;,&quot;lang&quot;: &quot;painless&quot;},&quot;query&quot;:{&quot;term&quot;:{&quot;msgid.keyword&quot;:&quot;${msgid}&quot;}}}</content>
         <contentType>application/json</contentType>
         <dataTypeBinary>false</dataTypeBinary>
         <charset>UTF-8</charset>
@@ -326,7 +265,7 @@ return;</undeployScript>
     <metadata>
       <enabled>true</enabled>
       <lastModified>
-        <time>1581593956618</time>
+        <time>1581605185801</time>
         <timezone>Europe/Lisbon</timezone>
       </lastModified>
       <pruningSettings>

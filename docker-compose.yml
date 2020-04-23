@@ -21,6 +21,8 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    environment:
+      discovery.type: single-node
 
   kibana:
     build: ./kibana
@@ -35,14 +37,8 @@ services:
       - elasticsearch
       
   postgres:
-    image: postgres:latest
+    build: ./postgres
     container_name: postgres
-    environment:
-      POSTGRES_PASSWORD: mirthdb
-      POSTGRES_USER: mirthdb
-      POSTGRES_DB: mirthdb
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
   
@@ -53,16 +49,50 @@ services:
       - ./mirth:/opt/connect/appdata
     environment:
       - DATABASE=postgres
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/mirthdb
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/pce
       - DATABASE_MAX_CONNECTIONS=20
-      - DATABASE_USERNAME=mirthdb
-      - DATABASE_PASSWORD=mirthdb
+      - DATABASE_USERNAME=pce
+      - DATABASE_PASSWORD=pce
       - KEYSTORE_STOREPASS=docker_storepass
       - KEYSTORE_KEYPASS=docker_keypass
     ports:
       - 8443:8443/tcp
     depends_on:
       - postgres
+      
+  logstash:
+    build: ./logstash
+    container_name: logstash
+    ports:
+      - "5044:5044/tcp"
+      - "5044:5044/udp"
+      - 9600:9600
+      - 8080:8080
+    depends_on:
+      - elasticsearch
+    links:
+      - "elasticsearch"
+  
+#  beats:
+#    build: ./beats
+#    container_name: beats
+#    volumes:
+#      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#    depends_on:
+#      - logstash
+#    ports:
+#      - 5044
+#    links:
+#      - "logstash"
+#      - "kibana"
+
+  generator:
+    build: ./generator
+    container_name: generator
+    depends_on: 
+      - postgres
+      - elasticsearch
 
 volumes:
   elastic:

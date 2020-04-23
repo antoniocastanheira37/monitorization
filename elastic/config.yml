@@ -1,0 +1,18 @@
+ca:
+   root:
+      dn: CN=root.ca.example.com,OU=CA,O=Example Com\, Inc.,DC=example,DC=com
+      file: root-ca.pem
+   intermediate:
+      dn: CN=signing.ca.example.com,OU=CA,O=Example Com\, Inc.,DC=example,DC=com
+      file: intermediate-ca.pem
+clients:
+   - name: spock
+     dn: CN=spock.example.com,OU=Ops,O=Example Com\, Inc.,DC=example,DC=com
+   - name: kirk
+     dn: CN=kirk.example.com,OU=Ops,O=Example Com\, Inc.,DC=example,DC=com
+     admin: true
+defaults:
+   validityDays: 3650
+   pkPassword: certificate-password      
+   httpsEnabled: true
+

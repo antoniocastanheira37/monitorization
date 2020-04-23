@@ -12,6 +12,8 @@ _sg_meta:
 ## Demo roles mapping
 
 SGS_ALL_ACCESS:
+  users:
+  - kirk
   reserved: true
   backend_roles:
   - "admin"

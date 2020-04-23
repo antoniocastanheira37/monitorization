@@ -1,13 +1,19 @@
 network.host: 0.0.0.0
 
-xpack.license.self_generated.type: basic
 xpack.security.enabled: false
 discovery.type: single-node
-searchguard.enterprise_modules_enabled: true
-
-searchguard.ssl.transport.keystore_filepath: sg/node-0-keystore.jks
-searchguard.ssl.transport.truststore_filepath: sg/truststore.jks
+  
+searchguard.ssl.transport.pemcert_filepath: intermediate-ca.pem
+searchguard.ssl.transport.pemkey_filepath: intermediate-ca.key
+searchguard.ssl.transport.pemkey_password: certificate-password
+searchguard.ssl.transport.pemtrustedcas_filepath: root-ca.pem
 searchguard.ssl.transport.enforce_hostname_verification: false
 
 searchguard.authcz.admin_dn:
-  - "CN=kirk,OU=client,O=client,l=tEst,C=De"
+  - CN=kirk.example.com,OU=Ops,O=Example Com\, Inc.,DC=example,DC=com
+
+http.compression: true
+searchguard.ssl.http.pemcert_filepath: intermediate-ca.pem
+searchguard.ssl.http.pemkey_filepath: intermediate-ca.key
+searchguard.ssl.http.pemkey_password: certificate-password
+searchguard.ssl.http.pemtrustedcas_filepath: root-ca.pem
