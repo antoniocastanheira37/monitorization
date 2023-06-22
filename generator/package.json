@@ -5,7 +5,7 @@
   "main": "create_table.js",
   "dependencies": {
     "@elastic/elasticsearch": "^7.6.0",
-    "pg": "^7.12.1"
+    "pg": "^8.11.0"
   },
   "devDependencies": {},
   "scripts": {
